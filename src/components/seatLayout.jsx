@@ -73,8 +73,7 @@ const SeatLayout = ({ seatState, column, row, hasError, seat, descks }) => {
 
   if (hasError) {
     return <h1>PLEASE CHECK THE SEAT ID !!</h1>;
-  }
-  console.log(seat);
+  }  
   return (
     <>
       <Grid row={row} column={seat === "sleeper" ? column * 2 : column}>

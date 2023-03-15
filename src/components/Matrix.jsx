@@ -15,7 +15,6 @@ function MatrixInput({
     const flattened = _.flatten(
       _.slice(matrix, 0, currentRow).concat(_.slice(matrix, currentRow + 1))
     );
-    console.log(flattened);
     return _.some(flattened, (val) => val.seatID === value && value !== "");
   }
 
@@ -31,7 +30,6 @@ function MatrixInput({
     }
 
     // Check if the value already exists in the row (excluding immediate neighbors)
-
     // if seatTyoe is sleeper and seater
     if (seat === "seater/sleeper") {
       for (let i = 0; i < rowValues.length; i++) {
@@ -54,6 +52,21 @@ function MatrixInput({
           return true;
         }
       }
+
+      const inputs = document.querySelectorAll("[type='text']");
+      const values = [];
+
+      // Store input values in array and check for duplicates
+      inputs.forEach((input) => {
+        if (input.value !== "") {
+          if (values.includes(input.value)) {
+            input.classList.add("invalid");
+          } else {
+            input.classList.remove("invalid");
+          }
+          values.push(input.value);
+        }
+      });
     }
     return false;
   }
@@ -84,9 +97,18 @@ function MatrixInput({
       setMatrix(newdata);
     };
     intialObject(numRows, numCols);
-  }, [numRows, numCols]);
+  }, [numRows, numCols, seat]);
 
   const handleChange = (row, col, e) => {
+    // const invalid = document?.querySelectorAll("[type='text']");
+    // for (let i = 0; i < invalid.length; i++) {
+    //   if (invalid[i].value !== "") {
+    //     if (invalid[i].value === e.target.value)
+    //       console.log(invalid[i].classList.add("invalid"));
+    //     else console.log(invalid[i].classList.remove("invalid"));
+    //   }
+    // }
+
     const newMatrix = [...matrix];
     const newValue = e.target.value;
 
@@ -108,13 +130,10 @@ function MatrixInput({
     setMatrix(newMatrix);
 
     // Set the input element's class based on the validation results
-    // =============first solution=========
     const newArray = _.flatten(matrix);
     e.target.className = isValid ? "" : "invalid";
 
     onSeatChange(newArray);
-    // =============second solution=========
-    // onSeatChange(matrix);
   };
 
   return (
