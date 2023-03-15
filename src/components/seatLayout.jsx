@@ -10,9 +10,8 @@ const Grid = ({ children, column, row }) => (
       gridTemplateColumns: `repeat(${column},minmax(50px,100px))`,
       gridTemplateRows: `repeat(${row}, 50px)`,
       gridGap: "5px",
-      // transform: "translate(90deg)",
       maxWidth: "200px",
-    }}> 
+    }}>
     {children}
   </div>
 );
@@ -30,7 +29,16 @@ const Seat = ({ seat }) => (
   </div>
 );
 
-const SeatLayout = ({ seatState, column, row, hasError }) => {
+const BalnkSeat = ({ seat }) => {
+  return (
+    <div
+      style={{
+        gridColumn: seat.seatType === "sleeper" ? `span 2` : `span 1`,
+      }}></div>
+  );
+};
+
+const SeatLayout = ({ seatState, column, row, hasError, seat, descks }) => {
   const [seatBlank, setSeatBlank] = useState([]);
   const [notSeatBlank, setNotSeatBlank] = useState([]);
   const [bus, setBus] = useState(notSeatBlank);
@@ -66,15 +74,15 @@ const SeatLayout = ({ seatState, column, row, hasError }) => {
   if (hasError) {
     return <h1>PLEASE CHECK THE SEAT ID !!</h1>;
   }
-
+  console.log(seat);
   return (
     <>
-      <Grid row={row} column={column}>
+      <Grid row={row} column={seat === "sleeper" ? column * 2 : column}>
         {renderSeat.map((seat) =>
           seat.seatID !== "" ? (
             <Seat key={seat.id} seat={seat} />
           ) : (
-            <div key={seat.id} ></div>
+            <BalnkSeat key={seat.id} seat={seat} />
           )
         )}
       </Grid>

@@ -1,39 +1,6 @@
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
 
-function isDuplicateValuePresent(matrix, value, currentRow) {
-  const flattened = _.flatten(
-    _.slice(matrix, 0, currentRow).concat(_.slice(matrix, currentRow + 1))
-  );
-  console.log(flattened);
-  return _.some(flattened, (val) => val.seatID === value && value !== "");
-}
-
-function isDuplicateValueInRow(matrix, value, row, col) {
-  const rowValues = matrix[row];
-
-  // Check the target column for the desired value
-  if (
-    rowValues[col].seatID === value ||
-    (rowValues[col].seatID === "" && value === undefined)
-  ) {
-    return true;
-  }
-
-  // Check if the value already exists in the row (excluding immediate neighbors)
-  for (let i = 0; i < rowValues.length; i++) {
-    if (i !== col && i !== col - 1 && i !== col + 1) {
-      if (
-        rowValues[i].seatID === value ||
-        (rowValues[i].seatID === "" && value === undefined)
-      ) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 function MatrixInput({
   numRows,
   numCols,
@@ -43,7 +10,54 @@ function MatrixInput({
   descks,
 }) {
   const [matrix, setMatrix] = useState([]);
-  console.log(seat, descks);
+
+  function isDuplicateValuePresent(matrix, value, currentRow) {
+    const flattened = _.flatten(
+      _.slice(matrix, 0, currentRow).concat(_.slice(matrix, currentRow + 1))
+    );
+    console.log(flattened);
+    return _.some(flattened, (val) => val.seatID === value && value !== "");
+  }
+
+  function isDuplicateValueInRow(matrix, value, row, col) {
+    const rowValues = matrix[row];
+
+    // Check the target column for the desired value
+    if (
+      rowValues[col].seatID === value ||
+      (rowValues[col].seatID === "" && value === undefined)
+    ) {
+      return true;
+    }
+
+    // Check if the value already exists in the row (excluding immediate neighbors)
+
+    // if seatTyoe is sleeper and seater
+    if (seat === "seater/sleeper") {
+      for (let i = 0; i < rowValues.length; i++) {
+        if (i !== col && i !== col - 1 && i !== col + 1) {
+          if (
+            rowValues[i].seatID === value ||
+            (rowValues[i].seatID === "" && value === undefined)
+          ) {
+            return true;
+          }
+        }
+      }
+    } else {
+      // if seat type is sleeper or seter
+      for (let i = 0; i < rowValues.length; i++) {
+        if (
+          rowValues[i].seatID === value ||
+          (rowValues[i].seatID === "" && value === undefined)
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   useEffect(() => {
     const uniqueIds = () => {
       let result = "";
@@ -54,6 +68,7 @@ function MatrixInput({
       }
       return result;
     };
+
     const intialObject = (col, row) => {
       const length = col * row;
       const newArr = [];
@@ -61,7 +76,7 @@ function MatrixInput({
         newArr.push({
           id: uniqueIds(),
           seatID: "",
-          seatType: "seater",
+          seatType: seat === "sleeper" ? "sleeper" : "seater",
           seatNumber: index,
         });
       }
@@ -77,7 +92,6 @@ function MatrixInput({
 
     const isDuplicateCol = isDuplicateValuePresent(matrix, newValue, row);
     const isDuplicateRow = isDuplicateValueInRow(matrix, newValue, row, col);
-
     let isValid = true;
     onError(false);
     if (newValue !== "") {
@@ -90,14 +104,14 @@ function MatrixInput({
 
     const newseat = { ...newMatrix[row][col], seatID: newValue };
 
-    console.log();
-
     newMatrix[row][col] = newseat;
     setMatrix(newMatrix);
+
     // Set the input element's class based on the validation results
-    e.target.className = isValid ? "" : "invalid";
     // =============first solution=========
     const newArray = _.flatten(matrix);
+    e.target.className = isValid ? "" : "invalid";
+
     onSeatChange(newArray);
     // =============second solution=========
     // onSeatChange(matrix);
